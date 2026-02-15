@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWFL | Residency Portal</title>
+    <style>
+        :root {
+            --primary: #5865F2;
+            --primary-hover: #4752c4;
+            --bg: #0f1012;
+            --card: #18191c;
+            --input: #1e1f22;
+            --text: #ffffff;
+            --muted: #949ba4;
+            --accent: #23a559;
+            --danger: #f23f42;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(88, 101, 242, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(88, 101, 242, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(88, 101, 242, 0); }
+        }
+
+        .container {
+            background: var(--card);
+            width: 100%;
+            max-width: 450px;
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { 
+            margin: 0; 
+            font-size: 24px; 
+            letter-spacing: -0.5px; 
+            background: linear-gradient(90deg, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p { color: var(--muted); font-size: 13px; margin-top: 8px; }
+
+        label { 
+            display: block; 
+            font-size: 11px; 
+            font-weight: 700; 
+            color: var(--muted); 
+            text-transform: uppercase; 
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            background: var(--input);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            transition: var(--transition);
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            background: #232428;
+        }
+
+        .row { display: flex; gap: 12px; }
+
+        .disabled-group { position: relative; opacity: 0.4; pointer-events: none; }
+        .status-badge {
+            position: absolute;
+            right: 12px;
+            top: 40px;
+            background: var(--danger);
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .price-summary {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 10px;
+        }
+
+        .price-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: var(--muted); }
+        .total-row {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+
+        button:hover { 
+            background: var(--primary-hover); 
+            transform: scale(1.02);
+            animation: pulse 1.5s infinite;
+        }
+
+        #receipt {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background: #fff;
+            color: #000;
+            border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .id-badge {
+            display: block;
+            text-align: center;
+            font-family: monospace;
+            font-size: 22px;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            color: var(--primary);
+            font-weight: 800;
+            border: 2px dashed #ccc;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            .container { padding: 20px; border-radius: 0; height: 100vh; max-width: 100%; }
+            body { padding: 0; background: var(--card); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>SWFL RESIDENCY</h1>
+        <p>Tenant Management & Portal</p>
+    </div>
+
+    <label>Account Identity</label>
+    <input type="text" id="username" placeholder="Roblox Username" oninput="updateTotal()">
+
+    <div class="row">
+        <div style="flex: 2;">
+            <label>Location</label>
+            <select id="complex" onchange="updateTotal()">
+                <option value="1.5">Gulf Paradise (Luxury)</option>
+                <option value="1.2">Bonita Modern (Standard)</option>
+                <option value="0.9">Coconut Lakes (Economy)</option>
+            </select>
+        </div>
+        <div style="flex: 1;">
+            <label>Unit #</label>
+            <input type="text" id="unit" placeholder="402">
+        </div>
+    </div>
+
+    <label>Rental Tier</label>
+    <select id="resType" onchange="updateTotal()">
+        <option value="50000">Resident Access ($50k Base)</option>
+        <option value="120000">VIP Premium Suite ($120k Base)</option>
+        <option value="80000">AirBnB / Short-Stay ($80k Base)</option>
+    </select>
+
+    <label>Duration</label>
+    <select id="duration" onchange="updateTotal()">
+        <option value="1">1 Session Day</option>
+        <option value="2">2 Session Days</option>
+        <option value="3">3 Session Days</option>
+        <option value="7">1 Full Week (OOC)</option>
+    </select>
+
+    <div class="disabled-group">
+        <span class="status-badge">RSFR OFFLINE</span>
+        <label>Citizenship Verification</label>
+        <input type="text" placeholder="Locked" disabled>
+    </div>
+
+    <div class="price-summary">
+        <div class="price-row"><span>Base Rate:</span><span id="baseLabel">$0</span></div>
+        <div class="price-row"><span>Location Multiplier:</span><span id="multLabel">x1.0</span></div>
+        <div class="price-row"><span>Server Tax (10%):</span><span id="taxLabel">$0</span></div>
+        <div class="price-row total-row"><span>Total Eco:</span><span id="totalDisplay">$0</span></div>
+    </div>
+
+    <button onclick="submitRequest()">Confirm Lease</button>
+
+    <div id="receipt">
+        <h3 style="margin-top:0; text-align:center;">LEASE ACTIVE</h3>
+        <p style="font-size:12px; margin: 0; text-align:center;">Present this code to the Landlord:</p>
+        <span class="id-badge" id="rCode">------</span>
+        <p style="font-size:10px; color:#555; text-align:center; margin:0;">Transaction logged in Management System</p>
+    </div>
+</div>
+
+<script>
+    const DISCORD_WEBHOOK = "YOUR_WEBHOOK_URL_HERE";
+
+    function updateTotal() {
+        const base = parseInt(document.getElementById('resType').value);
+        const mult = parseFloat(document.getElementById('complex').value);
+        const days = parseInt(document.getElementById('duration').value);
+        
+        const subtotal = (base * mult) * days;
+        const tax = subtotal * 0.10;
+        const final = subtotal + tax;
+
+        document.getElementById('baseLabel').innerText = "$" + base.toLocaleString();
+        document.getElementById('multLabel').innerText = "x" + mult;
+        document.getElementById('taxLabel').innerText = "$" + Math.floor(tax).toLocaleString();
+        document.getElementById('totalDisplay').innerText = "$" + Math.floor(final).toLocaleString();
+    }
+
+    async function submitRequest() {
+        const user = document.getElementById('username').value;
+        const comp = document.getElementById('complex').options[document.getElementById('complex').selectedIndex].text;
+        const unit = document.getElementById('unit').value;
+        const total = document.getElementById('totalDisplay').innerText.replace(/[$,]/g, '');
+        
+        if(!user || !unit) return alert("Please fill out all fields!");
+
+        const leaseID = "SWFL-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+        const payload = {
+            embeds: [{
+                title: "🏢 New Booking: " + leaseID,
+                color: 5793266,
+                fields: [
+                    { name: "👤 Tenant", value: `\`${user}\``, inline: true },
+                    { name: "📍 Location", value: `${comp} #${unit}`, inline: true },
+                    { name: "💵 Total Charged", value: `**$${parseInt(total).toLocaleString()}**`, inline: true },
+                    { name: "📜 Bot Command", value: `\`!remove-money "${user}" ${total} Rent at ${comp} #${unit} [ID: ${leaseID}]\`` }
+                ],
+                footer: { text: "RSRF Southwest Florida | Management System" },
+                timestamp: new Date()
+            }]
+        };
+
+        try {
+            await fetch(DISCORD_WEBHOOK, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            document.getElementById('receipt').style.display = 'block';
+            document.getElementById('rCode').innerText = leaseID;
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        } catch (e) {
+            alert("Connection error. Check your webhook.");
+        }
+    }
+
+    updateTotal();
+</script>
+
+</body>
+</html>
