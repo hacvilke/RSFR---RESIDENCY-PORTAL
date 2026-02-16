@@ -797,7 +797,7 @@ function updateTotal() {
     const days = parseInt(document.getElementById('duration').value);
 
     const subtotal = base * mult * days;
-    const tax = subtotal * 0.10;
+    const tax = subtotal * 0.0;
     const final = subtotal + tax;
 
     document.getElementById('baseLabel').textContent = "$" + base.toLocaleString();
